@@ -22,6 +22,7 @@ export default class CoolWalletBridge {
     const coolbitxcard = 'https://antoncoding.github.io'
     if (window.parent !== window) {
       // Open in Iframe
+      console.log({opener: window.opener})
       onmessage = ({ data, source, origin }) => {
         if (data.target && data.target === 'CWS-IFRAME') {
           let fullscreen
@@ -38,6 +39,8 @@ export default class CoolWalletBridge {
       }
     } else {
       // full screen or open directly
+      // opener: global
+      // referrer: undefined
       onmessage = ({data, source, origin}) => {
         if (data && data.target === 'CWS-TAB') {
           console.log(`got message send to tab!`)
@@ -55,15 +58,6 @@ export default class CoolWalletBridge {
               this.signPersonalMessage(replyAction, params.addrIndex, params.message)
               break
           }
-        }
-      }
-      console.log({ opener: window.opener }) // global
-      console.log({ referrer: window.referrer }) // undefined
-      if (window.referrer === coolbitxcard) {
-        const result = prompt('hello cooltibx user, please confirm xyz')
-        if (result === true) {
-          window.opener.postMessage('signed data from wallet blabla')
-          window.opener.focus()
         }
       }
     }
