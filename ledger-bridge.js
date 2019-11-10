@@ -45,6 +45,8 @@ export default class CoolWalletBridge {
     } else {
       // coolbitxcard is directly opened in a tab
       if (window.opener) {
+        console.log({opener: window.opener})
+        console.log({referrer: window.referrer})
         if (window.referrer === coolbitxcard) {
           const result = prompt('hello cooltibx user, please confirm xyz')
           if (result === true) {
@@ -53,7 +55,6 @@ export default class CoolWalletBridge {
           }
         }
       }
-      console.log(`what`)
     }
     // window.addEventListener(
     //   'message',
