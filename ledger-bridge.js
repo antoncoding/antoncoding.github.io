@@ -60,7 +60,6 @@ export default class CoolWalletBridge {
 
   cleanUp() {
     this.app = null
-    this.transport.close()
   }
 
   async unlock(replyAction, addIndex) {
