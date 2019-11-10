@@ -14,74 +14,71 @@ export default class CoolWalletBridge {
   constructor() {
     this.transport = new WebBleTransport()
     this.app = new CoolWalletEth(this.transport, appPrivateKey, appId)
-    this.connected = false
+    // this.connected = false
     this.addEventListeners()
   }
 
   addEventListeners() {
     const coolbitxcard = 'https://antoncoding.github.io'
-    console.log({ parent: window.parent })
-    console.log({ window })
-
     if (window.parent !== window) {
       // Open in Iframe
       onmessage = ({ data, source, origin }) => {
         if (data.target && data.target === 'CWS-IFRAME') {
           let fullscreen
-          if (source === window.parent) { // comes from metaMask
+          if (source === window.parent) {
+            // comes from metaMask
             // dapp
-            console.log({ parent: window.parent })
-            console.log({ origin }) // origin: "chrome-extension://mcahgmiplippbpbhhjdkmoooalmamckm"
-            console.log({ referrer: window.referrer }) // undefined
-
-            console.log(data)
+            // console.log({ parent: window.parent }) // global
+            // console.log({ origin }) // origin: "chrome-extension://mcahgmiplippbpbhhjdkmoooalmamckm"
+            // console.log({ referrer: window.referrer }) // undefined
+            // console.log({data})
             fullscreen = window.open(coolbitxcard)
             fullscreen.focus()
-            source.postMessage('message to source', '*')
-            window.parent.postMessage('message to parent', '*')
+            data.target = 'CWS-TAB'
+            fullscreen.postMessage(data, '*') // pass to full screen?
           } else if (source === fullscreen) {
+            console.log(`source === fullscreen`)
             window.parent.postMessage(data, '*')
           }
+        } else {
+          console.log(`Ignoreing Message ${JSON.stringify(data)}`)
         }
       }
     } else {
-      // coolbitxcard is directly opened in a tab
-      if (window.opener) {
-        console.log({ opener: window.opener })
-        console.log({ referrer: window.referrer })
-        if (window.referrer === coolbitxcard) {
-          const result = prompt('hello cooltibx user, please confirm xyz')
-          if (result === true) {
-            window.opener.postMessage('signed data from wallet blabla')
-            window.opener.focus()
+      // full screen or open directly
+      onmessage = ({data, source, origin}) => {
+        if (data && data.target === 'CWS-TAB') {
+          console.log(`got message send to tab!`)
+          console.log({source})
+          const { action, params } = data
+          const replyAction = `${action}-reply`
+          switch (action) {
+            case 'coolwallet-unlock':
+              this.unlock(replyAction, params.hdPath)
+              break
+            case 'coolwallet-sign-transaction':
+              this.signTransaction(replyAction, params.addrIndex, params.tx, params.to)
+              break
+            case 'coolwallet-sign-personal-message':
+              this.signPersonalMessage(replyAction, params.addrIndex, params.message)
+              break
           }
         }
       }
+      console.log({ opener: window.opener }) // global
+      console.log({ referrer: window.referrer }) // undefined
+      if (window.referrer === coolbitxcard) {
+        const result = prompt('hello cooltibx user, please confirm xyz')
+        if (result === true) {
+          window.opener.postMessage('signed data from wallet blabla')
+          window.opener.focus()
+        }
+      }
     }
-    // window.addEventListener(
-    //   'message',
-    //   async event => {
-    //     if (event && event.data && event.data.target === 'CWS-IFRAME') {
-    //       const { action, params } = e.data
-    //       const replyAction = `${action}-reply`
-    //       switch (action) {
-    //         case 'coolwallet-unlock':
-    //           this.unlock(replyAction, params.hdPath)
-    //           break
-    //         case 'coolwallet-sign-transaction':
-    //           this.signTransaction(replyAction, params.addrIndex, params.tx, params.to)
-    //           break
-    //         case 'coolwallet-sign-personal-message':
-    //           this.signPersonalMessage(replyAction, params.addrIndex, params.message)
-    //           break
-    //       }
-    //     }
-    //   },
-    //   false
-    // )
   }
 
   sendMessageToExtension(msg) {
+    console.log(`send message back to parent`)
     window.parent.postMessage(msg, '*')
   }
 
