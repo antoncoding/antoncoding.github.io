@@ -26,27 +26,29 @@ export default class CoolWalletBridge {
     if (window.parent !== window) {
       // Open in Iframe
       onmessage = ({ data, source, origin }) => {
-        let fullscreen;
-        if (source === window.parent) {
-          // dapp
-          console.log({ parent: window.parent })
-          console.log({ origin }) // origin: "chrome-extension://mcahgmiplippbpbhhjdkmoooalmamckm"
-          console.log({ referrer: window.referrer }) // undefined
+        if (data.target && data.target === 'CWS-IFRAME') {
+          let fullscreen
+          if (source === window.parent) { // comes from metaMask
+            // dapp
+            console.log({ parent: window.parent })
+            console.log({ origin }) // origin: "chrome-extension://mcahgmiplippbpbhhjdkmoooalmamckm"
+            console.log({ referrer: window.referrer }) // undefined
 
-          console.log(data)
-          fullscreen = window.open(coolbitxcard)
-          fullscreen.focus()
-          source.postMessage('message to source', '*')
-          window.parent.postMessage('message to parent', '*')
-        } else if (source === fullscreen) {
-          window.parent.postMessage(data, '*')
+            console.log(data)
+            fullscreen = window.open(coolbitxcard)
+            fullscreen.focus()
+            source.postMessage('message to source', '*')
+            window.parent.postMessage('message to parent', '*')
+          } else if (source === fullscreen) {
+            window.parent.postMessage(data, '*')
+          }
         }
       }
     } else {
       // coolbitxcard is directly opened in a tab
       if (window.opener) {
-        console.log({opener: window.opener})
-        console.log({referrer: window.referrer})
+        console.log({ opener: window.opener })
+        console.log({ referrer: window.referrer })
         if (window.referrer === coolbitxcard) {
           const result = prompt('hello cooltibx user, please confirm xyz')
           if (result === true) {
