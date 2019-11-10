@@ -35,8 +35,6 @@ export default class CoolWalletBridge {
             this.bc.postMessage(data, '*') // pass to full screen?
             console.log(`After relay message to tab`)
           } 
-        } else {
-          console.log(`Ignoreing Message ${JSON.stringify(data)}`)
         }
       }
 
