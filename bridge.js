@@ -48,7 +48,10 @@ export default class CoolWalletBridge {
       // full screen or open directly
       // opener: global
       // referrer: undefined
+      console.log(`open connect screen!`)
       this.bc.onmessage  = ({data, source, origin}) => {
+        console.log(`got bc message!`)
+        console.log(data)
         if (data && data.target === 'CWS-TAB') {
           console.log(`got message send to tab!`)
           console.log({source})
