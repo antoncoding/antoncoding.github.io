@@ -1,6 +1,6 @@
 'use strict'
 import 'babel-polyfill';
-import CoolWalletBridge from './ledger-bridge'
+import CoolWalletBridge from './bridge'
 
 
 (async () => {

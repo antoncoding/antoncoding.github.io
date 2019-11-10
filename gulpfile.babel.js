@@ -9,7 +9,7 @@ const paths = {
     source: './main.js',
     destination: './',
     filename: 'bundle.js',
-    watch: ['./main.js', 'ledger-bridge.js']
+    watch: ['./main.js', 'bridge.js']
   }
 }
 
