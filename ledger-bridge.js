@@ -14,8 +14,10 @@ export default class CoolWalletBridge {
   constructor() {
     this.transport = new WebBleTransport()
     this.app = new CoolWalletEth(this.transport, appPrivateKey, appId)
+    this.bc = new BroadcastChannel('test_channel')
     // this.connected = false
     this.addEventListeners()
+    
   }
 
   addEventListeners() {
@@ -30,18 +32,22 @@ export default class CoolWalletBridge {
             fullscreen = window.open(coolbitxcard)
             fullscreen.focus()
             data.target = 'CWS-TAB'
-            fullscreen.postMessage(data, '*') // pass to full screen?
+            this.bc.postMessage(data, '*') // pass to full screen?
             console.log(`After relay message to tab`)
           } 
         } else {
           console.log(`Ignoreing Message ${JSON.stringify(data)}`)
         }
       }
+
+      this.bc.onmessage = (data) =>{
+        this.sendMessageToExtension(data)
+      }
     } else {
       // full screen or open directly
       // opener: global
       // referrer: undefined
-      onmessage = ({data, source, origin}) => {
+      this.bc.onmessage  = ({data, source, origin}) => {
         if (data && data.target === 'CWS-TAB') {
           console.log(`got message send to tab!`)
           console.log({source})
@@ -58,6 +64,8 @@ export default class CoolWalletBridge {
               this.signPersonalMessage(replyAction, params.addrIndex, params.message)
               break
           }
+        } else {
+          console.log(`got message ${JSON.stringify(data)}`)
         }
       }
     }
@@ -66,6 +74,11 @@ export default class CoolWalletBridge {
   sendMessageToExtension(msg) {
     console.log(`send message back to parent`)
     window.parent.postMessage(msg, '*')
+  }
+
+  sendMessageToIframe(msg) {
+    console.log(`send message back to iframe`)
+    this.bc.postMessage(msg)
   }
 
   async connectWallet() {
