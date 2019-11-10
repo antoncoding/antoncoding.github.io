@@ -21,24 +21,29 @@ export default class CoolWalletBridge {
   addEventListeners() {
     const coolbitxcard = 'https://antoncoding.github.io'
     console.log({ parent: window.parent })
-    console.log({window})
+    console.log({ window })
 
-    if (window.parent !== window) { // Open in Iframe
+    if (window.parent !== window) {
+      // Open in Iframe
       onmessage = ({ data, source, origin }) => {
-        if (source === window.parent) { // dapp
-        console.log({ origin })
-        console.log({ referrer: window.referrer })
-     
-        console.log(data)
-        const fullscreen = window.open(coolbitxcard)
-        fullscreen.focus()
-        source.postMessage('message to source', '*')
-        window.parent.postMessage('foo', '*')
+        let fullscreen;
+        if (source === window.parent) {
+          // dapp
+          console.log({ parent: window.parent })
+          console.log({ origin }) // origin: "chrome-extension://mcahgmiplippbpbhhjdkmoooalmamckm"
+          console.log({ referrer: window.referrer }) // undefined
+
+          console.log(data)
+          fullscreen = window.open(coolbitxcard)
+          fullscreen.focus()
+          source.postMessage('message to source', '*')
+          window.parent.postMessage('message to parent', '*')
         } else if (source === fullscreen) {
-           window.parent.postMessage(data, '*')
+          window.parent.postMessage(data, '*')
         }
       }
-    } else { // coolbitxcard is directly opened in a tab
+    } else {
+      // coolbitxcard is directly opened in a tab
       if (window.opener) {
         if (window.referrer === coolbitxcard) {
           const result = prompt('hello cooltibx user, please confirm xyz')
@@ -46,7 +51,6 @@ export default class CoolWalletBridge {
             window.opener.postMessage('signed data from wallet blabla')
             window.opener.focus()
           }
-   
         }
       }
       console.log(`what`)
