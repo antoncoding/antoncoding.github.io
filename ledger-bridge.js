@@ -25,21 +25,13 @@ export default class CoolWalletBridge {
       onmessage = ({ data, source, origin }) => {
         if (data.target && data.target === 'CWS-IFRAME') {
           let fullscreen
-          if (source === window.parent) {
-            // comes from metaMask
-            // dapp
-            // console.log({ parent: window.parent }) // global
-            // console.log({ origin }) // origin: "chrome-extension://mcahgmiplippbpbhhjdkmoooalmamckm"
-            // console.log({ referrer: window.referrer }) // undefined
-            // console.log({data})
+          if (source === window.parent) { // data frin extebsuib
             fullscreen = window.open(coolbitxcard)
             fullscreen.focus()
             data.target = 'CWS-TAB'
             fullscreen.postMessage(data, '*') // pass to full screen?
-          } else if (source === fullscreen) {
-            console.log(`source === fullscreen`)
-            window.parent.postMessage(data, '*')
-          }
+            console.log(`After relay message to tab`)
+          } 
         } else {
           console.log(`Ignoreing Message ${JSON.stringify(data)}`)
         }
