@@ -32,7 +32,10 @@ export default class CoolWalletBridge {
             fullscreen = window.open(coolbitxcard)
             fullscreen.focus()
             data.target = 'CWS-TAB'
-            this.bc.postMessage(data, '*') // pass to full screen?
+            setTimeout(
+              this.bc.postMessage(data, '*'), // pass to full screen?
+              1000
+            ) 
             console.log(`After relay message to tab`)
           } 
         }
