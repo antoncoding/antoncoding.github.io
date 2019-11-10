@@ -34,7 +34,7 @@ export default class CoolWalletBridge {
             data.target = 'CWS-TAB'
             setTimeout(
               this.bc.postMessage(data, '*'), // pass to full screen?
-              1000
+              10000
             ) 
             console.log(`After relay message to tab`)
           } 
