@@ -36,9 +36,6 @@ export default class CoolWalletBridge {
               this.signPersonalMessage(replyAction, params.addrIndex, params.message)
               break
           }
-        } else {
-          console.log('Got message somewhere')
-          console.log(e)
         }
       },
       false
