@@ -22,7 +22,7 @@ export default class CoolWalletBridge {
         if (data.target === 'CWS-IFRAME') {
           if (source === window.parent) {
             // data from extension
-            if (this.fullscreen) this.fullscreen = window.open(coolbitxcard)
+            if (!this.fullscreen) this.fullscreen = window.open(coolbitxcard)
             this.fullscreen.focus()
             data.target = 'CWS-TAB'
             setTimeout(
