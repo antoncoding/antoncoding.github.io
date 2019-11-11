@@ -34,8 +34,8 @@ export default class CoolWalletBridge {
               console.log(`blocking...`)
               await this.sleep(2000)
             }
-            console.log(`childTab here and connected`)
-            console.log(this.childTab)
+            console.log(`sending to child`)
+            console.log(data)
             this.bc.postMessage(data, '*') // pass to full screen?
               
             this.childTab.focus()
@@ -66,7 +66,7 @@ export default class CoolWalletBridge {
               this.unlock(replyAction, params.addrIndex)
               break
             case 'coolwallet-sign-transaction':
-              this.signTransaction(replyAction, params.addrIndex, params.tx, params.to)
+              this.signTransaction(replyAction, params.addrIndex, params.tx)
               break
             case 'coolwallet-sign-personal-message':
               this.signPersonalMessage(replyAction, params.addrIndex, params.message)
@@ -141,7 +141,7 @@ export default class CoolWalletBridge {
   async signTransaction(replyAction, addrIndex, tx) {
     try {
       await this.waitForConnection()
-      const res = await this.app.signTransaction(addrIndex, tx)
+      const res = await this.app.signTransaction(tx, addrIndex)
       this.sendMessageToIframe({
         action: replyAction,
         success: true,
