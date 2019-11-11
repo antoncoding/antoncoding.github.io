@@ -12,6 +12,7 @@ const appId = '50fb246982570ce2198a51cde1f12cbc1e0ef344'
 export default class CoolWalletBridge {
   constructor() {
     this.bc = new BroadcastChannel('test_channel')
+    this.childTab = null
     this.addEventListeners()
   }
 
@@ -22,13 +23,15 @@ export default class CoolWalletBridge {
         if (data.target === 'CWS-IFRAME') {
           if (source === window.parent) {
             // data from extension
-            if (!this.fullscreen) this.fullscreen = window.open(coolbitxcard)
-            this.fullscreen.focus()
+            if (this.childTab === null) {
+              this.childTab = window.open(coolbitxcard)
+            }
             data.target = 'CWS-TAB'
             setTimeout(
               this.bc.postMessage(data, '*'), // pass to full screen?
               10000
             )
+            this.childTab.focus()
             console.log(`After relay message to tab`)
           }
         }
