@@ -37,7 +37,7 @@ export default class CoolWalletBridge {
             } 
             console.log(`childTab here`)
             console.log(this.childTab)
-            this.bc.postMessage(data, '*'), // pass to full screen?
+            this.bc.postMessage(data, '*') // pass to full screen?
               
             this.childTab.focus()
           }
