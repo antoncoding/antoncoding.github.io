@@ -108,13 +108,13 @@ export default class CoolWalletBridge {
       await this.waitForConnection()
       const { parentPublicKey, parentChainCode } = await this.app.getPublicKey(addrIndex, true)
       const res = { parentChainCode, parentPublicKey }
-      this.sendMessageToExtension({
+      this.sendMessageToIframe({
         action: replyAction,
         success: true,
         payload: res,
       })
     } catch (err) {
-      this.sendMessageToExtension({
+      this.sendMessageToIframe({
         action: replyAction,
         success: false,
         payload: { error: err.toString() },
@@ -128,13 +128,13 @@ export default class CoolWalletBridge {
     try {
       await this.waitForConnection()
       const res = await this.app.signTransaction(hdPath, tx)
-      this.sendMessageToExtension({
+      this.sendMessageToIframe({
         action: replyAction,
         success: true,
         payload: res,
       })
     } catch (err) {
-      this.sendMessageToExtension({
+      this.sendMessageToIframe({
         action: replyAction,
         success: false,
         payload: { error: err.toString() },
@@ -149,13 +149,13 @@ export default class CoolWalletBridge {
       await this.waitForConnection()
       const res = await this.app.signMessage(message, addIndex)
 
-      this.sendMessageToExtension({
+      this.sendMessageToIframe({
         action: replyAction,
         success: true,
         payload: res,
       })
     } catch (err) {
-      this.sendMessageToExtension({
+      this.sendMessageToIframe({
         action: replyAction,
         success: false,
         payload: { error: err.toString() },
