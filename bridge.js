@@ -55,11 +55,8 @@ export default class CoolWalletBridge {
       }
     } else {
       // full screen or open directly .Opener: global, referrer: undefined
-      console.log(`open connect screen!`)
-      
       console.log(`set up bc onmessage....`)
       this.bc.onmessage = ({ data, source, origin }) => {
-        console.log(data)
         if (data && data.target === 'CWS-TAB') {
           console.log(`got message send to tab!`)
           const { action, params } = data
@@ -76,7 +73,7 @@ export default class CoolWalletBridge {
               break
           }
         } else {
-          console.log(`got message ${JSON.stringify(data)}`)
+          console.log(`got bc message ${JSON.stringify(data)}`)
         }
       }
     }
@@ -99,8 +96,7 @@ export default class CoolWalletBridge {
       if (err) {
         throw err
       }
-      const transport = await WebBleTransport.connect(device)
-      this.transport = transport
+      this.transport = await WebBleTransport.connect(device)
       this.bc.postMessage({target:'connection-success'})
       console.log(`set transport done!`)
     })
