@@ -26,7 +26,7 @@ export default class CoolWalletBridge {
     const coolbitxcard = 'https://antoncoding.github.io'
     if (window.parent !== window) {
       // Open in Iframe
-      console.log({opener: window.opener})
+      // console.log({opener: window.opener}) // undefined
       onmessage = ({ data, source, origin }) => {
         if (data.target && data.target === 'CWS-IFRAME') {
           console.log(`iframe got message: ${source}: ${JSON.stringify(data)}`)
@@ -38,10 +38,10 @@ export default class CoolWalletBridge {
               this.bc.postMessage(data, '*'), // pass to full screen?
               10000
             ) 
-            setTimeout(
-              fullscreen.postMessage(data, '*'),
-              20000
-            )
+            // setTimeout(
+            //   fullscreen.postMessage(data, '*'),
+            //   20000
+            // )
             console.log(`After relay message to tab`)
           } 
         }
