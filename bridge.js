@@ -32,7 +32,7 @@ export default class CoolWalletBridge {
             } 
             while (this.blockOnFirstCall === true) {
               console.log(`blocking...`)
-              await sleep(2000)
+              await this.sleep(2000)
             }
             console.log(`childTab here and connected`)
             console.log(this.childTab)
@@ -46,6 +46,7 @@ export default class CoolWalletBridge {
       this.bc.onmessage = ({data, source}) => {
         console.log(`got bc message ${JSON.stringify(data)}`)
         if ( data.target === 'connection-success' ) {
+          console.log(`child tab connected!`)
           this.blockOnFirstCall = false
         } else {
           this.sendMessageToExtension(data)
