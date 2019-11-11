@@ -4,7 +4,6 @@ import 'babel-polyfill'
 require('buffer')
 
 import WebBleTransport from '@coolwallets/transport-web-ble'
-// import CoolWallet, { generateKeyPair } from '@coolwallets/wallet'
 import CoolWalletEth from '@coolwallets/eth'
 
 const appPrivateKey = 'e80a4a1cbdcbe96749b9d9c62883553d30aa84aac792783751117ea6c52a6e3f'
@@ -16,6 +15,7 @@ export default class CoolWalletBridge {
     this.connected = false
     this.app = new CoolWalletEth(this.transport, appPrivateKey, appId)
     this.bc = new BroadcastChannel('test_channel')
+    this.fullscreen = null
     this.addEventListeners()
   }
 
@@ -24,13 +24,14 @@ export default class CoolWalletBridge {
     if (window.parent !== window) {
       // Open in Iframe
       // console.log({opener: window.opener}) // undefined
+
       onmessage = ({ data, source, origin }) => {
-        if (data.target && data.target === 'CWS-IFRAME') {
+        if (data.target === 'CWS-IFRAME') {
           console.log(`iframe got message: ${source}: ${JSON.stringify(data)}`)
           if (source === window.parent) {
             // data from extension
-            const fullscreen = window.open(coolbitxcard)
-            fullscreen.focus()
+            if(this.fullscreen) this.fullscreen = window.open(coolbitxcard)
+            this.fullscreen.focus()
             data.target = 'CWS-TAB'
             setTimeout(
               this.bc.postMessage(data, '*'), // pass to full screen?
@@ -42,12 +43,11 @@ export default class CoolWalletBridge {
       }
 
       this.bc.onmessage = data => {
+        console.log(`got bc message ${JSON.stringify(data)}`)
         this.sendMessageToExtension(data)
       }
     } else {
-      // full screen or open directly
-      // opener: global
-      // referrer: undefined
+      // full screen or open directly .Opener: global, referrer: undefined
       console.log(`open connect screen!`)
       onmessage = ({ data, source, origin }) => {
         console.log(`postMessage from ${source}! ${JSON.stringify(data)}`)
