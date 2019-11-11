@@ -32,7 +32,6 @@ export default class CoolWalletBridge {
               10000
             )
             this.childTab.focus()
-            console.log(`After relay message to tab`)
           }
         }
       }
@@ -108,8 +107,7 @@ export default class CoolWalletBridge {
   async unlock(replyAction, addrIndex) {
     try {
       await this.waitForConnection()
-      const { parentPublicKey, parentChainCode } = await this.app.getPublicKey(addrIndex, true)
-      const res = { parentChainCode, parentPublicKey }
+      const res = await this.app.getPublicKey(addrIndex, true)
       this.sendMessageToIframe({
         action: replyAction,
         success: true,
