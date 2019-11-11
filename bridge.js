@@ -13,6 +13,7 @@ export default class CoolWalletBridge {
   constructor() {
     this.bc = new BroadcastChannel('test_channel')
     this.childTab = null
+    this.blockOnFirstCall = true
     this.addEventListeners()
   }
 
@@ -22,15 +23,20 @@ export default class CoolWalletBridge {
       onmessage = ({ data, source, origin }) => {
         if (data.target === 'CWS-IFRAME') {
           if (source === window.parent) {
+            
             // data from extension
+            data.target = 'CWS-TAB'
+            
             if (this.childTab === null) {
               this.childTab = window.open(coolbitxcard)
-            }
-            data.target = 'CWS-TAB'
-            setTimeout(
-              this.bc.postMessage(data, '*'), // pass to full screen?
-              10000
-            )
+              while(this.blockOnFirstCall){
+                setTimeout(()=>{
+                  console.log(`waiting for user connection`)
+                }, 3000)
+              }
+            } 
+            this.bc.postMessage(data, '*'), // pass to full screen?
+              
             this.childTab.focus()
           }
         }
@@ -38,7 +44,12 @@ export default class CoolWalletBridge {
 
       this.bc.onmessage = ({data, source}) => {
         console.log(`got bc message ${JSON.stringify(data)}`)
-        this.sendMessageToExtension(data)
+        if ( data.target === 'connection-success' ) {
+          this.blockOnFirstCall = false
+        } else {
+          this.sendMessageToExtension(data)
+        }
+        
       }
     } else {
       // full screen or open directly .Opener: global, referrer: undefined
@@ -78,6 +89,7 @@ export default class CoolWalletBridge {
     console.log(`send message back to iframe`)
     console.log(msg)
     this.bc.postMessage(msg)
+    window.opener.focus()
   }
 
   async userConenct() {
@@ -87,6 +99,7 @@ export default class CoolWalletBridge {
       }
       const transport = await WebBleTransport.connect(device)
       this.transport = transport
+      this.bc.postMessage({target:'connection-success'})
       console.log(`set transport done!`)
     })
   }
