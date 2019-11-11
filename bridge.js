@@ -37,16 +37,14 @@ export default class CoolWalletBridge {
         }
       }
 
-      this.bc.onmessage = data => {
+      this.bc.onmessage = ({data, source}) => {
         console.log(`got bc message ${JSON.stringify(data)}`)
         this.sendMessageToExtension(data)
       }
     } else {
       // full screen or open directly .Opener: global, referrer: undefined
       console.log(`open connect screen!`)
-      onmessage = ({ data, source, origin }) => {
-        console.log(`postMessage from ${source}! ${JSON.stringify(data)}`)
-      }
+      
       console.log(`set up bc onmessage....`)
       this.bc.onmessage = ({ data, source, origin }) => {
         console.log(data)
@@ -79,6 +77,7 @@ export default class CoolWalletBridge {
 
   sendMessageToIframe(msg) {
     console.log(`send message back to iframe`)
+    console.log(msg)
     this.bc.postMessage(msg)
   }
 
