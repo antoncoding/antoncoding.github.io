@@ -18,7 +18,7 @@ export default class CoolWalletBridge {
   }
 
   addEventListeners() {
-    const coolbitxcard = 'https://antoncoding.github.io'
+    const tabDomain = 'https://antoncoding.github.io'
     if (window.parent !== window) {
       onmessage = async ({ data, source, origin }) => {
         if (data.target === 'CWS-IFRAME') {
@@ -27,8 +27,8 @@ export default class CoolWalletBridge {
             // data from extension
             data.target = 'CWS-TAB'
             
-            if (this.childTab === null) {
-              this.childTab = window.open(coolbitxcard)
+            if (!this.childTab) {
+              this.childTab = window.open(tabDomain, "tab")
             } 
             while (this.blockOnFirstCall === true) {
               console.log(`blocking...`)
