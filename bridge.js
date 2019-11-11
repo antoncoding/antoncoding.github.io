@@ -20,7 +20,7 @@ export default class CoolWalletBridge {
   addEventListeners() {
     const coolbitxcard = 'https://antoncoding.github.io'
     if (window.parent !== window) {
-      onmessage = ({ data, source, origin }) => {
+      onmessage = async ({ data, source, origin }) => {
         if (data.target === 'CWS-IFRAME') {
           if (source === window.parent) {
             
@@ -30,7 +30,11 @@ export default class CoolWalletBridge {
             if (this.childTab === null) {
               this.childTab = window.open(coolbitxcard)
             } 
-            console.log(`childTab here`)
+            while (this.blockOnFirstCall === true) {
+              console.log(`blocking...`)
+              await sleep(2000)
+            }
+            console.log(`childTab here and connected`)
             console.log(this.childTab)
             this.bc.postMessage(data, '*') // pass to full screen?
               
@@ -67,8 +71,6 @@ export default class CoolWalletBridge {
               this.signPersonalMessage(replyAction, params.addrIndex, params.message)
               break
           }
-        } else {
-          console.log(`got bc message ${JSON.stringify(data)}`)
         }
       }
     }
@@ -174,5 +176,9 @@ export default class CoolWalletBridge {
     } finally {
       this.cleanUp()
     }
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
