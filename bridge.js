@@ -12,14 +12,11 @@ const appId = '50fb246982570ce2198a51cde1f12cbc1e0ef344'
 
 export default class CoolWalletBridge {
   constructor() {
-    WebBleTransport.listen((err, device)=>{
-
-    })
+    WebBleTransport.listen((err, device) => {})
     this.connected = false
     this.app = new CoolWalletEth(this.transport, appPrivateKey, appId)
     this.bc = new BroadcastChannel('test_channel')
     this.addEventListeners()
-    
   }
 
   addEventListeners() {
@@ -30,24 +27,21 @@ export default class CoolWalletBridge {
       onmessage = ({ data, source, origin }) => {
         if (data.target && data.target === 'CWS-IFRAME') {
           console.log(`iframe got message: ${source}: ${JSON.stringify(data)}`)
-          if (source === window.parent) { // data from extension
+          if (source === window.parent) {
+            // data from extension
             const fullscreen = window.open(coolbitxcard)
             fullscreen.focus()
             data.target = 'CWS-TAB'
             setTimeout(
               this.bc.postMessage(data, '*'), // pass to full screen?
               10000
-            ) 
-            // setTimeout(
-            //   fullscreen.postMessage(data, '*'),
-            //   20000
-            // )
+            )
             console.log(`After relay message to tab`)
-          } 
+          }
         }
       }
 
-      this.bc.onmessage = (data) =>{
+      this.bc.onmessage = data => {
         this.sendMessageToExtension(data)
       }
     } else {
@@ -55,15 +49,15 @@ export default class CoolWalletBridge {
       // opener: global
       // referrer: undefined
       console.log(`open connect screen!`)
-      onmessage = ({data, source, origin})=> {
+      onmessage = ({ data, source, origin }) => {
         console.log(`postMessage from ${source}! ${JSON.stringify(data)}`)
       }
       console.log(`set up bc onmessage....`)
-      this.bc.onmessage  = ({data, source, origin}) => {
+      this.bc.onmessage = ({ data, source, origin }) => {
         console.log(data)
         if (data && data.target === 'CWS-TAB') {
           console.log(`got message send to tab!`)
-          console.log({source})
+          console.log({ source })
           const { action, params } = data
           const replyAction = `${action}-reply`
           switch (action) {
@@ -115,13 +109,13 @@ export default class CoolWalletBridge {
       await this.connectWallet()
       const { parentPublicKey, parentChainCode } = await this.app.getPublicKey(addIndex, true)
       const res = { parentChainCode, parentPublicKey }
-      this.sendMessageToIframe({
+      this.sendMessageToExtension({
         action: replyAction,
         success: true,
         payload: res,
       })
     } catch (err) {
-      this.sendMessageToIframe({
+      this.sendMessageToExtension({
         action: replyAction,
         success: false,
         payload: { error: err.toString() },
@@ -135,13 +129,13 @@ export default class CoolWalletBridge {
     try {
       await this.connectWallet()
       const res = await this.app.signTransaction(hdPath, tx)
-      this.sendMessageToIframe({
+      this.sendMessageToExtension({
         action: replyAction,
         success: true,
         payload: res,
       })
     } catch (err) {
-      this.sendMessageToIframe({
+      this.sendMessageToExtension({
         action: replyAction,
         success: false,
         payload: { error: err.toString() },
@@ -156,13 +150,13 @@ export default class CoolWalletBridge {
       await this.connectWallet()
       const res = await this.app.signMessage(message, addIndex)
 
-      this.sendMessageToIframe({
+      this.sendMessageToExtension({
         action: replyAction,
         success: true,
         payload: res,
       })
     } catch (err) {
-      this.sendMessageToIframe({
+      this.sendMessageToExtension({
         action: replyAction,
         success: false,
         payload: { error: err.toString() },
