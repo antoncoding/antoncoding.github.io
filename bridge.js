@@ -27,7 +27,7 @@ export default class CoolWalletBridge {
 
       onmessage = ({ data, source, origin }) => {
         if (data.target === 'CWS-IFRAME') {
-          console.log(`iframe got message: ${source}: ${JSON.stringify(data)}`)
+          console.log(data)
           if (source === window.parent) {
             // data from extension
             if(this.fullscreen) this.fullscreen = window.open(coolbitxcard)
