@@ -35,6 +35,8 @@ export default class CoolWalletBridge {
                 }, 3000)
               }
             } 
+            console.log(`childTab here`)
+            console.log(this.childTab)
             this.bc.postMessage(data, '*'), // pass to full screen?
               
             this.childTab.focus()
@@ -137,10 +139,10 @@ export default class CoolWalletBridge {
     }
   }
 
-  async signTransaction(replyAction, hdPath, tx) {
+  async signTransaction(replyAction, addrIndex, tx) {
     try {
       await this.waitForConnection()
-      const res = await this.app.signTransaction(hdPath, tx)
+      const res = await this.app.signTransaction(addrIndex, tx)
       this.sendMessageToIframe({
         action: replyAction,
         success: true,
