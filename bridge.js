@@ -29,11 +29,6 @@ export default class CoolWalletBridge {
             
             if (this.childTab === null) {
               this.childTab = window.open(coolbitxcard)
-              while(this.blockOnFirstCall){
-                setTimeout(()=>{
-                  console.log(`waiting for user connection`)
-                }, 3000)
-              }
             } 
             console.log(`childTab here`)
             console.log(this.childTab)
@@ -104,7 +99,12 @@ export default class CoolWalletBridge {
 
   async waitForConnection() {
     try {
-      while (this.transport === null) {}
+      while (this.transport === null) {
+        setTimeout(
+          console.log('waiting for connection'),
+          3000
+        )
+      }
       this.app = new CoolWalletEth(this.transport, appPrivateKey, appId)
     } catch (e) {
       console.log('CWS:::CONNECTION ERROR', e)
