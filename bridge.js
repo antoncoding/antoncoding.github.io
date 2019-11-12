@@ -26,7 +26,9 @@ export default class CoolWalletBridge {
             
             // data from extension
             data.target = 'CWS-TAB'
-            this.childTab = window.open(tabDomain, "tab")
+            if (this.childTab === null){
+              this.childTab = window.open(tabDomain, "tab")
+            }
             
             while (this.blockOnFirstCall === true) {
               console.log(`blocking...`)
@@ -99,7 +101,7 @@ export default class CoolWalletBridge {
     try {
       while (this.transport === null) {
         setTimeout(
-          console.log('Waiting for bluetooth'),
+          console.log('Waiting for connection'),
           3000
         )
       }
