@@ -11,7 +11,7 @@ const appId = '50fb246982570ce2198a51cde1f12cbc1e0ef344'
 
 export default class CoolWalletBridge {
   constructor() {
-    this.bc = new BroadcastChannel('test_channel')
+    this.bc = new BroadcastChannel('coolwallets')
     this.childTab = null
     this.blockOnFirstCall = true
     this.addEventListeners()
@@ -33,7 +33,6 @@ export default class CoolWalletBridge {
               await this.sleep(1000)
             }
             console.log(`sending to child`)
-            console.log(data)
             this.bc.postMessage(data, '*') // pass to full screen?
               
             this.childTab.focus()
@@ -56,7 +55,6 @@ export default class CoolWalletBridge {
       console.log(`set up bc onmessage....`)
       this.bc.onmessage = ({ data, source, origin }) => {
         if (data && data.target === 'CWS-TAB') {
-          console.log(`got message send to tab!`)
           const { action, params } = data
           const replyAction = `${action}-reply`
           switch (action) {
@@ -64,10 +62,10 @@ export default class CoolWalletBridge {
               this.unlock(replyAction, params.addrIndex)
               break
             case 'coolwallet-sign-transaction':
-              this.signTransaction(replyAction, params.addrIndex, params.tx)
+              this.signTransaction(replyAction, params.addrIndex, params.tx, params.publicKey)
               break
             case 'coolwallet-sign-personal-message':
-              this.signPersonalMessage(replyAction, params.addrIndex, params.message)
+              this.signPersonalMessage(replyAction, params.addrIndex, params.message, params.publicKey)
               break
           }
         }
@@ -94,7 +92,6 @@ export default class CoolWalletBridge {
       }
       this.transport = await WebBleTransport.connect(device)
       this.bc.postMessage({target:'connection-success'})
-      console.log(`set transport done!`)
     })
   }
 
@@ -102,7 +99,7 @@ export default class CoolWalletBridge {
     try {
       while (this.transport === null) {
         setTimeout(
-          console.log('waiting for connection'),
+          console.log('Waiting for bluetooth'),
           3000
         )
       }
@@ -136,10 +133,10 @@ export default class CoolWalletBridge {
     }
   }
 
-  async signTransaction(replyAction, addrIndex, tx) {
+  async signTransaction(replyAction, addrIndex, tx, publicKey) {
     try {
       await this.waitForConnection()
-      const res = await this.app.signTransaction(tx, addrIndex)
+      const res = await this.app.signTransaction(tx, addrIndex, publicKey)
       this.sendMessageToIframe({
         action: replyAction,
         success: true,
