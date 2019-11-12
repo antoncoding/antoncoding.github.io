@@ -26,13 +26,11 @@ export default class CoolWalletBridge {
             
             // data from extension
             data.target = 'CWS-TAB'
+            this.childTab = window.open(tabDomain, "tab")
             
-            if (!this.childTab) {
-              this.childTab = window.open(tabDomain, "tab")
-            } 
             while (this.blockOnFirstCall === true) {
               console.log(`blocking...`)
-              await this.sleep(2000)
+              await this.sleep(1000)
             }
             console.log(`sending to child`)
             console.log(data)
