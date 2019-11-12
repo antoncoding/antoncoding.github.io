@@ -28,6 +28,10 @@ export default class CoolWalletBridge {
             data.target = 'CWS-TAB'
             if (this.childTab === null){
               this.childTab = window.open(tabDomain, "tab")
+              this.childTab.onbeforeunload = ()=>{
+                console.log(`child tab closed`)
+                this.childTab = null
+              }
             }
             
             while (this.blockOnFirstCall === true) {
