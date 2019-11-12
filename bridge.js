@@ -98,6 +98,7 @@ export default class CoolWalletBridge {
       }
       this.transport = await WebBleTransport.connect(device)
       this.bc.postMessage({target:'connection-success'})
+      console.log(`post connected message to channel`)
     })
   }
 
@@ -142,6 +143,8 @@ export default class CoolWalletBridge {
   async signTransaction(replyAction, addrIndex, tx, publicKey) {
     try {
       await this.waitForConnection()
+      console.log(`signing with this key`)
+      console.log(publicKey)
       const res = await this.app.signTransaction(tx, addrIndex, publicKey)
       this.sendMessageToIframe({
         action: replyAction,
