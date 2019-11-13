@@ -12,9 +12,8 @@ const appId = '50fb246982570ce2198a51cde1f12cbc1e0ef344'
 export default class CoolWalletBridge {
   constructor() {
     this.bc = new BroadcastChannel('coolwallets')
-    this.childTab = null
-    this.blockOnFirstCall = true
     this.addEventListeners()
+    this.cleanTab()
   }
 
   addEventListeners() {
@@ -28,10 +27,7 @@ export default class CoolWalletBridge {
             data.target = 'CWS-TAB'
             if (this.childTab === null){
               this.childTab = window.open(tabDomain, "tab")
-              this.childTab.onbeforeunload = ()=>{
-                this.childTab = null
-                this.blockOnFirstCall = true
-              }
+              this.childTab.onbeforeunload = this.cleanTab()
             }
             
             while (this.blockOnFirstCall === true) {
@@ -110,6 +106,11 @@ export default class CoolWalletBridge {
 
   cleanUp() {
     this.app = null
+  }
+  
+  cleanTab(){
+    this.childTab = null
+    this.blockOnFirstCall = true
   }
 
   async unlock(replyAction, addrIndex) {
