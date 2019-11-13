@@ -29,8 +29,8 @@ export default class CoolWalletBridge {
             if (this.childTab === null){
               this.childTab = window.open(tabDomain, "tab")
               this.childTab.onbeforeunload = ()=>{
-                console.log(`child tab closed`)
                 this.childTab = null
+                this.blockOnFirstCall = true
               }
             }
             
@@ -38,8 +38,7 @@ export default class CoolWalletBridge {
               console.log(`blocking...`)
               await this.sleep(1000)
             }
-            console.log(`sending to child`)
-            this.bc.postMessage(data, '*') // pass to full screen?
+            this.bc.postMessage(data, '*')
               
             this.childTab.focus()
           }
@@ -47,7 +46,6 @@ export default class CoolWalletBridge {
       }
 
       this.bc.onmessage = ({data, source}) => {
-        console.log(`got bc message ${JSON.stringify(data)}`)
         if ( data.target === 'connection-success' ) {
           console.log(`child tab connected!`)
           this.blockOnFirstCall = false
@@ -57,9 +55,7 @@ export default class CoolWalletBridge {
         
       }
     } else {
-      // full screen or open directly .Opener: global, referrer: undefined
-      console.log(`set up bc onmessage....`)
-      this.bc.onmessage = ({ data, source, origin }) => {
+      this.bc.onmessage = ({ data }) => {
         if (data && data.target === 'CWS-TAB') {
           const { action, params } = data
           const replyAction = `${action}-reply`
@@ -80,13 +76,10 @@ export default class CoolWalletBridge {
   }
 
   sendMessageToExtension(msg) {
-    console.log(`send message back to parent`)
     window.parent.postMessage(msg, '*')
   }
 
   sendMessageToIframe(msg) {
-    console.log(`send message back to iframe`)
-    console.log(msg)
     this.bc.postMessage(msg)
     window.opener.focus()
   }
@@ -98,7 +91,6 @@ export default class CoolWalletBridge {
       }
       this.transport = await WebBleTransport.connect(device)
       this.bc.postMessage({target:'connection-success'})
-      console.log(`post connected message to channel`)
     })
   }
 
