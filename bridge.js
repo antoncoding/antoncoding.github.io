@@ -147,10 +147,10 @@ export default class CoolWalletBridge {
     }
   }
 
-  async signTransaction(replyAction, addrIndex, tx) {
+  async signTransaction(replyAction, addrIndex, tx, publicKey) {
     try {
       await this.waitForConnection()
-      const res = await this.app.signTransaction(tx, addrIndex)
+      const res = await this.app.signTransaction(tx, addrIndex, publicKey)
       this.sendMessageToIframe({
         action: replyAction,
         success: true,
