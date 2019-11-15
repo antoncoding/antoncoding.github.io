@@ -4,10 +4,11 @@ import 'babel-polyfill'
 require('buffer')
 
 import WebBleTransport from '@coolwallets/transport-web-ble'
+import CoolWallet from '@coolwallets/wallet'
 import CoolWalletEth from '@coolwallets/eth'
 
-const appPrivateKey = 'e80a4a1cbdcbe96749b9d9c62883553d30aa84aac792783751117ea6c52a6e3f'
-const appId = '50fb246982570ce2198a51cde1f12cbc1e0ef344'
+import { getAppKeys } from './utils'
+const { appPublicKey, appPrivateKey } = getAppKeys()
 
 export default class CoolWalletBridge {
   constructor() {
@@ -80,6 +81,14 @@ export default class CoolWalletBridge {
     window.opener.focus()
   }
 
+  async register(password) {
+    const appId =  this.getAppId()
+    const wallet = new CoolWallet(this.transport, appPrivateKey, appId)
+    wallet.register(appPublicKey, password, "CoolWalletBridge").then(appId => {
+      localStorage.setItem("appId", appId)
+    })
+  }
+
   async userConenct() {
     WebBleTransport.listen(async (err, device) => {
       if (err) {
@@ -98,10 +107,15 @@ export default class CoolWalletBridge {
           3000
         )
       }
+      const appId =  this.getAppId()
       this.app = new CoolWalletEth(this.transport, appPrivateKey, appId)
     } catch (e) {
       console.log('CWS:::CONNECTION ERROR', e)
     }
+  }
+
+  getAppId(){
+    return localStorage.getItem("appId")
   }
 
   cleanUp() {

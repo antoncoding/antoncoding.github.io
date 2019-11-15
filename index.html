@@ -25,9 +25,16 @@
   <body>
   <div style="margin:100px">
   <div style="padding-left:200">
-    <button type="button" class="block" id="connect">
-      Connect
-    </button>
+  <button type="button" class="block" id="connect">
+    Connect
+  </button>
+
+  
+    <input id="pwd">
+
+    </input>
+    <button id="register" class="block" onclick="registerApp()"> Register </button>
+  
   </div>
   </div>
   <i class="fa fa-bluetooth" aria-hidden="true"></i>
@@ -35,7 +42,15 @@
     <script>
       document.getElementById("connect").onclick = function() {
         bridge.userConenct()
-    };
+      };
+  </script>
+  <script>
+    function registerApp(){
+        let pwd = document.getElementById("pwd").value;
+        console.log('got password');
+        console.log(pwd);
+        bridge.register(pwd);
+      };
   </script>
   </body>
 </html>
