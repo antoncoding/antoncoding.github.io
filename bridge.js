@@ -109,7 +109,7 @@ export default class CoolWalletBridge {
           3000
         )
       }
-      const appId =  this.getAppId()
+      const appId = this.getAppId()
       this.app = new CoolWalletEth(this.transport, appPrivateKey, appId)
     } catch (e) {
       console.log('CWS:::CONNECTION ERROR', e)
@@ -169,10 +169,10 @@ export default class CoolWalletBridge {
     }
   }
 
-  async signPersonalMessage(replyAction, addIndex, message) {
+  async signPersonalMessage(replyAction, addIndex, message, publicKey) {
     try {
       await this.waitForConnection()
-      const res = await this.app.signMessage(message, addIndex)
+      const res = await this.app.signMessage(message, addIndex, publicKey)
 
       this.sendMessageToIframe({
         action: replyAction,
