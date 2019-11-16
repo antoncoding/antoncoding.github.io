@@ -81,7 +81,6 @@ export default class CoolWalletBridge {
 
   sendMessageToIframe(msg) {
     this.bc.postMessage(msg)
-    window.opener.focus()
   }
 
   async register(password) {
