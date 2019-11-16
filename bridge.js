@@ -14,6 +14,7 @@ export default class CoolWalletBridge {
   constructor() {
     this.bc = new BroadcastChannel('coolwallets')
     this.addEventListeners()
+    console.log(`new bridge...`)
     this.cleanTab()
   }
 
