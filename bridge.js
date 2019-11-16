@@ -27,12 +27,13 @@ export default class CoolWalletBridge {
             
             // data from extension
             data.target = 'CWS-TAB'
-            if (this.childTab === null){
-              this.childTab = this.openOnce(tabDomain, "tab")
-              this.childTab.onbeforeunload = this.cleanTab()
-            } else {
-              this.childTab.focus()
-            }
+            this.openOnce(tabDomain, "coolwallets-tab")
+            // if (this.childTab === null){
+            //   this.childTab = this.openOnce(tabDomain, "tab")
+            //   this.childTab.onbeforeunload = this.cleanTab()
+            // } else {
+            //   this.childTab.focus()
+            // }
             
             while (this.blockOnFirstCall === true) {
               console.log(`blocking...`)
@@ -127,7 +128,7 @@ export default class CoolWalletBridge {
   
   cleanTab(){
     console.log(`Cleaning iframe memory for tab`)
-    this.childTab = null
+    // this.childTab = null
     this.blockOnFirstCall = true
   }
 
