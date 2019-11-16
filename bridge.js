@@ -66,6 +66,9 @@ export default class CoolWalletBridge {
             case 'coolwallet-sign-personal-message':
               this.signPersonalMessage(replyAction, params.addrIndex, params.message, params.publicKey)
               break
+            case 'coolwallet-sign-typed-data':
+              this.signTypedData(replyAction, params.addrIndex, params.typedData, params.publicKey)
+              break
           }
         }
       }
@@ -172,6 +175,26 @@ export default class CoolWalletBridge {
       await this.waitForConnection()
       const res = await this.app.signMessage(message, addIndex)
 
+      this.sendMessageToIframe({
+        action: replyAction,
+        success: true,
+        payload: res,
+      })
+    } catch (err) {
+      this.sendMessageToIframe({
+        action: replyAction,
+        success: false,
+        payload: { error: err.toString() },
+      })
+    } finally {
+      this.cleanUp()
+    }
+  }
+
+  async signTypedData(replyAction, addrIndex, typedData, publicKey) {
+    try {
+      await this.waitForConnection()
+      const res = await this.app.signTypedData(typedData, addrIndex, publicKey)
       this.sendMessageToIframe({
         action: replyAction,
         success: true,
