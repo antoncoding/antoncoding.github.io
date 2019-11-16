@@ -29,6 +29,8 @@ export default class CoolWalletBridge {
             if (this.childTab === null){
               this.childTab = window.open(tabDomain, "tab")
               this.childTab.onbeforeunload = this.cleanTab()
+            } else {
+              this.childTab.focus()
             }
             
             while (this.blockOnFirstCall === true) {
@@ -36,8 +38,6 @@ export default class CoolWalletBridge {
               await this.sleep(1000)
             }
             this.bc.postMessage(data, '*')
-              
-            this.childTab.focus()
           }
         }
       }
@@ -125,6 +125,7 @@ export default class CoolWalletBridge {
   }
   
   cleanTab(){
+    console.log(`Cleaning iframe memory for tab`)
     this.childTab = null
     this.blockOnFirstCall = true
   }
