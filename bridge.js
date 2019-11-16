@@ -28,7 +28,7 @@ export default class CoolWalletBridge {
             // data from extension
             data.target = 'CWS-TAB'
             if (this.childTab === null){
-              this.childTab = window.open(tabDomain, "tab")
+              this.childTab = this.openOnce(tabDomain, "tab")
               this.childTab.onbeforeunload = this.cleanTab()
             } else {
               this.childTab.focus()
@@ -211,6 +211,17 @@ export default class CoolWalletBridge {
       this.cleanUp()
     }
   }
+
+  openOnce(url, target){
+    var winref = window.open('', target, '', true);
+
+    // if the "target" window was just opened, change its url
+    if(winref.location.href === 'about:blank'){
+        winref.location.href = url;
+    }
+    return winref;
+  }
+
 
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));

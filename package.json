@@ -23,7 +23,7 @@
     "vinyl-source-stream": "^2.0.0"
   },
   "dependencies": {
-    "@coolwallets/eth": "0.1.5",
+    "@coolwallets/eth": "^0.1.6",
     "@coolwallets/transport-web-ble": "0.0.16",
     "@coolwallets/wallet": "0.0.1-beta",
     "babel-polyfill": "^6.26.0",
