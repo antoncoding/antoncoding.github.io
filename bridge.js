@@ -14,7 +14,6 @@ export default class CoolWalletBridge {
   constructor() {
     this.bc = new BroadcastChannel('coolwallets')
     this.addEventListeners()
-    console.log(`new bridge...`)
     this.cleanTab()
   }
 
@@ -27,30 +26,21 @@ export default class CoolWalletBridge {
             
             // data from extension
             data.target = 'CWS-TAB'
-            this.openOnce(tabDomain, "coolwallets-tab")
-            // if (this.childTab === null){
-            //   this.childTab = this.openOnce(tabDomain, "tab")
-            //   this.childTab.onbeforeunload = this.cleanTab()
-            // } else {
-            //   this.childTab.focus()
-            // }
-            
-            while (this.blockOnFirstCall === true) {
-              console.log(`blocking...`)
-              await this.sleep(1000)
+            let tab = this.openOnce(tabDomain, "coolwallets-tab")
+            tab.onload = ()=>{
+              this.bc.postMessage(data, '*')
             }
-            this.bc.postMessage(data, '*')
           }
         }
       }
 
       this.bc.onmessage = ({data, source}) => {
-        if ( data.target === 'connection-success' ) {
-          console.log(`child tab connected!`)
-          this.blockOnFirstCall = false
-        } else {
+        // if ( data.target === 'connection-success' ) {
+          // console.log(`child tab connected!`)
+          // this.blockOnFirstCall = false
+        // } else {
           this.sendMessageToExtension(data)
-        }
+        // }
         
       }
     } else {
@@ -99,7 +89,7 @@ export default class CoolWalletBridge {
         throw err
       }
       this.transport = await WebBleTransport.connect(device)
-      this.bc.postMessage({target:'connection-success'})
+      // this.bc.postMessage({target:'connection-success'})
     })
   }
 
