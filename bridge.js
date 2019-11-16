@@ -13,8 +13,8 @@ const { appPublicKey, appPrivateKey } = getAppKeys()
 export default class CoolWalletBridge {
   constructor() {
     this.bc = new BroadcastChannel('coolwallets')
+    this.blockOnFirstCall = true
     this.addEventListeners()
-    this.cleanTab()
   }
 
   addEventListeners() {
@@ -23,25 +23,25 @@ export default class CoolWalletBridge {
       onmessage = async ({ data, source, origin }) => {
         if (data.target === 'CWS-IFRAME') {
           if (source === window.parent) {
-            
             // data from extension
-            data.target = 'CWS-TAB'
-            let tab = this.openOnce(tabDomain, "coolwallets-tab")
-            tab.onload = ()=>{
-              this.bc.postMessage(data, '*')
+            this.openOnce(tabDomain, 'coolwallets-tab')
+
+            while (this.blockOnFirstCall === true) {
+              await this.sleep(1000)
             }
+
+            data.target = 'CWS-TAB'
+            this.bc.postMessage(data, '*')
           }
         }
       }
 
-      this.bc.onmessage = ({data, source}) => {
-        // if ( data.target === 'connection-success' ) {
-          // console.log(`child tab connected!`)
-          // this.blockOnFirstCall = false
-        // } else {
+      this.bc.onmessage = ({ data, source }) => {
+        if (data.target === 'connection-success') {
+          this.blockOnFirstCall = false
+        } else {
           this.sendMessageToExtension(data)
-        // }
-        
+        }
       }
     } else {
       this.bc.onmessage = ({ data }) => {
@@ -76,10 +76,10 @@ export default class CoolWalletBridge {
   }
 
   async register(password) {
-    const appId =  this.getAppId()
+    const appId = localStorage.getItem('appId')
     const wallet = new CoolWallet(this.transport, appPrivateKey, appId)
-    wallet.register(appPublicKey, password, "CoolWalletBridge").then(appId => {
-      localStorage.setItem("appId", appId)
+    wallet.register(appPublicKey, password, 'CoolWalletBridge').then(appId => {
+      localStorage.setItem('appId', appId)
     })
   }
 
@@ -89,37 +89,24 @@ export default class CoolWalletBridge {
         throw err
       }
       this.transport = await WebBleTransport.connect(device)
-      // this.bc.postMessage({target:'connection-success'})
+      this.bc.postMessage({ target: 'connection-success' })
     })
   }
 
   async waitForConnection() {
     try {
       while (this.transport === null) {
-        setTimeout(
-          console.log('Waiting for connection'),
-          3000
-        )
+        setTimeout(console.log('Waiting for connection'), 1000)
       }
-      const appId = this.getAppId()
+      const appId = localStorage.getItem('appId')
       this.app = new CoolWalletEth(this.transport, appPrivateKey, appId)
     } catch (e) {
       console.log('CWS:::CONNECTION ERROR', e)
     }
   }
 
-  getAppId(){
-    return localStorage.getItem("appId")
-  }
-
   cleanUp() {
     this.app = null
-  }
-  
-  cleanTab(){
-    console.log(`Cleaning iframe memory for tab`)
-    // this.childTab = null
-    this.blockOnFirstCall = true
   }
 
   async unlock(replyAction, addrIndex) {
@@ -203,18 +190,17 @@ export default class CoolWalletBridge {
     }
   }
 
-  openOnce(url, target){
-    var winref = window.open('', target, '', true);
+  openOnce(url, target) {
+    var winref = window.open('', target, '', true)
 
     // if the "target" window was just opened, change its url
-    if(winref.location.href === 'about:blank'){
-        winref.location.href = url;
+    if (winref.location.href === 'about:blank') {
+      winref.location.href = url
     }
-    return winref;
+    return winref
   }
 
-
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms))
   }
 }
